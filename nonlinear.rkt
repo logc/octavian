@@ -109,6 +109,4 @@
                    (* v (+ r 1) (((expt (+ r 1) 5) . - . 1) . / .  (sqr r)))))]
           [f (curry avg-return-rate 1000 6000)]
           [df (curry davg-return-rate 1000)])
-      (check-= (newton f df 0.01 𝛆 3) 0.06140241153618 𝛆))
-    )
-  )
+      (check-= (newton f df 0.01 𝛆 3) 0.06140241153618 𝛆))))
