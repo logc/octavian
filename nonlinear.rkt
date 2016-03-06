@@ -146,3 +146,48 @@
     (check-eqv? (hoerner '(0 2 3 1) 3) (+ 0 (* 2 3) (* 3 (sqr 3)) (expt 3 3)))
     (check-eqv? (hoerner '(1 1 1) 0) 1)
     (check-eqv? (hoerner '(7 0 1) 1) (+ 7 (sqr 1)))))
+
+;; NEWTONHOERNER computes all roots of the polynomial `a` using Newton-Hoerner's
+;;   method, starting at `x_0`. For each root, the method stops after `nmax`
+;;   iterations (default: 100) or after the absolute value of the difference
+;;   between two consecutive iterations is less than a given tolerance `𝛆`
+;;   (default: 1 * 10e-4).
+(define (newton-hoerner a x_0 [𝛆 1e-4] [niter 100])
+  (cond
+    [(= niter 0) (error "Not converged")]
+    [(= 1 (length a)) empty]
+    [else
+      (let ([root (newton (lambda (z) (hoerner a z))
+                    (lambda (z) (hoerner (diff a) z))
+                    x_0 𝛆 niter)])
+        (cons root (newton-hoerner (deflate a root) x_0 𝛆 niter)))]))
+
+(define (diff a [n (length a)])
+  (cond
+    [(empty? a) empty]
+    [(= n (length a)) (diff (rest a) n)]
+    [else (cons (* (- n (length a)) (first a))
+                (diff (rest a) n))]))
+
+(define (deflate a z)
+  (define n (length a))
+  (define b (make-list n 0))
+  (set! b (list-set b 0 (list-ref a 0)))
+  (for ([j (in-range 1 n)])
+    (set! b (list-set b j (+ (list-ref a j) (* (list-ref b (sub1 j)) z)))))
+  ; return all except the first one, because we express polynomials in reverse
+  ; to the reference book
+  (rest b))
+
+(module+ test
+  ;(test-case
+  ;  "Find roots of `p(x) = x^3 - 6x^2 + 11x - 6` using Newton-Hörner method"
+  ;  (check-= (first  (newton-hoerner '(-6 11 -6 1) 0 1e-15)) 1 1e-15)
+  ;  (check-= (second (newton-hoerner '(-6 11 -6 1) 0 1e-15)) 2 1e-15)
+  ;  (check-= (third  (newton-hoerner '(-6 11 -6 1) 0 1e-15)) 3 1e-15)
+  ;  )
+  (test-case
+    "Find roots of `p(x) = x^4 - 7 x^3 + 15 x^2 - 13 x + 4`"
+    (check-= (first (newton-hoerner '(4 -13 15 -7 1) 0 1e-15)) 1 1e-5)
+    )
+  )
