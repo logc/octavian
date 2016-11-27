@@ -17,7 +17,8 @@
           [((* (f a) (f x)) . < . 0)
            (bisection f a x 𝛆 (sub1 nmax))]
           [((* (f x) (f b)) . < . 0)
-           (bisection f x b 𝛆 (sub1 nmax))]))]))
+           (bisection f x b 𝛆 (sub1 nmax))]
+          [else error "could not find a zero"]))]))
 
 ;; K_MIN minimum number of steps that are necessary to find a zero in the
 ;;   interval `[a, b]` with tolerance `𝛆`
