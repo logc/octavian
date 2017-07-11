@@ -14,8 +14,8 @@
   )
 
 (define setup-math
-  (paragraph 
-   (style 
+  (paragraph
+   (style
     #f (list (alt-tag "script")
              (attributes `((type . "text/javascript")
                            (src . ,mathjax-source )))))
@@ -24,7 +24,7 @@
 (define (mymath start end . strs)
   (make-element (make-style "relax" '(exact-chars)) `(,start ,@strs ,end)))
 
-(define (math-in . strs) 
+(define (math-in . strs)
   (apply mymath "\\(" "\\)" strs))
 
 (define (math-disp . strs)
