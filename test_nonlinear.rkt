@@ -5,8 +5,8 @@
 (test-case
   "Basic bisection tests"
   (let ([𝛆 1e-5]
-        [f (lambda (x) x)]
-        [g (lambda (x) (+ x 1))])
+        [f (λ (x) x)]
+        [g (λ (x) (+ x 1))])
     (check-= (bisection f  0 1 𝛆) 0 𝛆)
     (check-= (bisection f -1 0 𝛆) 0 𝛆)
     (check-= (bisection f -1 1 𝛆) 0 𝛆)
@@ -15,7 +15,7 @@
 (test-case
   "Bisection with max-iter less than correct"
   (let ([𝛆 1e-5]
-        [h (lambda (x) (- (sqr x) 1))])
+        [h (λ (x) (- (sqr x) 1))])
     (check-= (bisection h -0.25 1.25 𝛆 3) 0.96875 𝛆)
     (check-= (bisection h -0.25 1.25 𝛆 (k_min -0.25 1.25 𝛆)) 1 𝛆)))
 
@@ -23,7 +23,7 @@
   "Investment fund"
   (let* ([𝛆 (expt 10 -12)] [a 0.01] [b 0.1]
                            [avg-return-rate
-                             (lambda (v M r)
+                             (λ (v M r)
                                (M . - . (* v ((1 . + . r) . / . r)
                                            ((expt (1 . + .  r) 5) . - . 1))))]
                            [f (curry avg-return-rate 1000 6000)])
@@ -32,12 +32,12 @@
 (test-case
   "Basic Newton tests"
   (let ([𝛆 1e-5]
-        [f (lambda (x) x)]
-        [df (lambda (x) 1)]
-        [g (lambda (x) (+ x 1))]
-        [dg (lambda (x) 1)]
-        [h (lambda (x) (- (sqr x) 1))]
-        [dh (lambda (x) (* 2 x))])
+        [f (λ (x) x)]
+        [df (λ (x) 1)]
+        [g (λ (x) (+ x 1))]
+        [dg (λ (x) 1)]
+        [h (λ (x) (- (sqr x) 1))]
+        [dh (λ (x) (* 2 x))])
     (check-= (newton f df -1 𝛆 1) 0 𝛆)
     (check-= (newton f df -10 𝛆 1) 0 𝛆)
     (check-= (newton g dg 0 𝛆 1) -1 𝛆)
@@ -48,10 +48,10 @@
 (test-case
   "Investment fund solved by Newton"
   (let* ([𝛆 1e-12]
-         [avg-return-rate (lambda (v M r)
+         [avg-return-rate (λ (v M r)
                             (M . - . (* v ((1 . + . r) . / . r)
                                         ((expt (1 . + .  r) 5) . - . 1))))]
-         [davg-return-rate (lambda (v r)
+         [davg-return-rate (λ (v r)
                              (+ (* -5 v ((expt (+ r 1) 5) . / . r))
                                 (* -1 v (((expt (+ r 1) 5) . - . 1) . / . r))
                                 (* v (+ r 1) (((expt (+ r 1) 5) . - . 1) . / .  (sqr r)))))]
@@ -61,8 +61,8 @@
 
 (test-case
   "Find root 𝜶 = 1 of function `f(x) = e^x * (x - 1)` using Aitken's method"
-  (let ([𝜙_0 (lambda (x) (log (* x (exp x))))]
-        [𝜙_1 (lambda (x) (/ (+ (exp x) x) (+ (exp x) 1)))]
+  (let ([𝜙_0 (λ (x) (log (* x (exp x))))]
+        [𝜙_1 (λ (x) (/ (+ (exp x) x) (+ (exp x) 1)))]
         [𝛆 1e-10]
         [x_0 2])
     (check-= (aitken 𝜙_0 x_0 𝛆) 1.0 𝛆)
