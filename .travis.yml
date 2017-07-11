@@ -40,6 +40,9 @@ before_install:
 install:
 
 before_script:
+  - cd logc/octavian
+  - raco pkg install .
+  - cd ../..
 
 # Here supply steps such as raco make, raco test, etc.  Note that you
 # need to supply /usr/racket/bin/ -- it's not in PATH. You can run
