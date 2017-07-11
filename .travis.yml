@@ -22,10 +22,10 @@ env:
     # versions.
     #- RACKET_VERSION=6.5
     #- RACKET_VERSION=6.6
-    - RACKET_VERSION=6.7
-    - RACKET_VERSION=6.8
+    #- RACKET_VERSION=6.7
+    #- RACKET_VERSION=6.8
     - RACKET_VERSION=6.9
-    - RACKET_VERSION=HEAD
+    #- RACKET_VERSION=HEAD
 
 matrix:
   allow_failures:
@@ -40,9 +40,9 @@ before_install:
 install:
 
 before_script:
-  - cd logc/octavian
-  - raco pkg install .
-  - cd ../..
+  - pwd
+  - ls -l
+  - raco pkg install logc/octavian
 
 # Here supply steps such as raco make, raco test, etc.  Note that you
 # need to supply /usr/racket/bin/ -- it's not in PATH. You can run
