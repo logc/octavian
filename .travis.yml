@@ -1,4 +1,4 @@
-language: racket
+language: c
 
 # Based from: https://github.com/greghendershott/travis-racket
 
@@ -33,16 +33,14 @@ matrix:
     fast_finish: true
 
 before_install:
-- git clone https://github.com/greghendershott/travis-racket.git
-- cat travis-racket/install-racket.sh | bash # pipe to bash not sh!
-- export PATH="${RACKET_DIR}/bin:${PATH}" #install-racket.sh can't set for us
+  - git clone https://github.com/greghendershott/travis-racket.git
+  - cat travis-racket/install-racket.sh | bash # pipe to bash not sh!
+  - export PATH="${RACKET_DIR}/bin:${PATH}" #install-racket.sh can't set for us
 
 install:
+  - raco pkg install .
 
 before_script:
-  - pwd
-  - ls -l
-  - raco pkg install logc/octavian
 
 # Here supply steps such as raco make, raco test, etc.  Note that you
 # need to supply /usr/racket/bin/ -- it's not in PATH. You can run
