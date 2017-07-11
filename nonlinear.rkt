@@ -1,5 +1,5 @@
 #lang racket
-(provide (prefix-out octavian/ (all-defined-out)))
+(provide (all-defined-out))
 
 ;; BISECTION find a zero of function `f` in interval `[a, b]`, with a tolerance
 ;;   `𝛆` in the result.  Optionally, pass a maximum number of iterations
