@@ -4,7 +4,7 @@
 
 (define (polyfit xs ys grade)
   (define m (add1 grade))
-  (define n (length xs)) ; should match (length ys)
+  (define n (length xs))
   (define M
     (build-matrix
       m m
