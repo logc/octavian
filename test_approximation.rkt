@@ -53,9 +53,35 @@
       (define p (map (λ (x) (polyval c x)) x1))
       (define f1 (map f x1))
       (apply max (map (compose abs -) p f1)))
-    (check-= (err 5) 0.6386 1e-4)
+    (check-= (err  5) 0.6386 1e-4)
     (check-= (err 10) 0.1322 1e-4)
     (check-= (err 20) 0.0177 1e-4)
     ;; this example outputs the following warning in octave 4.2.1:
     ;; warning: matrix singular to machine precision, rcond = 1.42019e-31
     #;(check-= (err 40) 3.3996e-04 1e-4)))
+
+(test-case
+    "Barycentric interpolation"
+  (define a -5)
+  (define b 5)
+  (define f (λ (x) (1 . / . (1 . + . (sqr x)))))
+  (let* ([xs (chebyshev-nodes a b 4)]
+         [ys (map f xs)])
+    (check-= (barycentric xs ys 4.9) 0.0088179 1e-7)
+    (check-= (barycentric xs ys -1.0) 0.89316 1e-5)
+    (check-= (barycentric xs ys 0.0) 1.0 1e-5)
+    (check-= (barycentric xs ys 227) 7.5591e+06 1e2))
+  (let* ([xs (chebyshev-nodes a b 12)]
+         [ys (map f xs)])
+    (check-= (barycentric xs ys 4.9) 0.035205 1e-6)
+    (check-= (barycentric xs ys -1.0) 0.55924 1e-5)
+    (check-= (barycentric xs ys 0.0) 1.0 1e-5)
+    ;; Chosen nearer to b because further away the implementations diverge (?)
+    (check-= (barycentric xs ys 22) 3.2619e9 1e5))
+  (let* ([xs (chebyshev-nodes a b 128)]
+         [ys (map f xs)])
+    (check-= (barycentric xs ys 4.9) 0.039984 1e-6)
+    (check-= (barycentric xs ys -1.0) 1/2 1e-6)
+    (check-= (barycentric xs ys 0.0) 1.0 1e-9)
+    ;; Notice how this has to be even nearer to b
+    (check-= (barycentric xs ys 5.1) 0.079201 1e-6)))
