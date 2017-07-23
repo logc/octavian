@@ -3,7 +3,8 @@
 (require rackunit)
 (require math/matrix
          math/array)
-(require "approximation.rkt")
+(require "approximation.rkt"
+         "fundamentals.rkt")
 
 (define-simple-check (check-all-= actual-numbers expected-numbers epsilon)
                      (for ([actual actual-numbers]
@@ -12,11 +13,6 @@
 
 (define-simple-check (check-matrix-= M N epsilon)
                      (check-all-= (matrix->list M) (matrix->list N) epsilon))
-
-;; TODO: move somewhere more general
-(define (linspace a b n)
-  (let ([step (/ (- b a) (exact->inexact n))])
-    (build-list (add1 n) (lambda (x) (+ a (* step x))))))
 
 (test-case
     "Polyval"
