@@ -4,7 +4,8 @@
 (provide polyfit
          polyval
          chebyshev-nodes
-         barycentric)
+         barycentric
+         dft)
 
 ;; POLYFIT returns the Lagrange interpolation polynomial of grade `n` that fits
 ;;   values `ys` at points `xs` with least squared error.
@@ -64,3 +65,16 @@
     (for/sum ([k (in-range 0 n)] [x_k xs])
       ((barycentric-weights k) . / . (x_1 . - . x_k))))
   (barycentric-numerator . / . barycentric-denominator))
+
+;; DFT discrete Fourier transform
+(define (dft X)
+  (define N (array-size X))
+  (define (naive-dft X)
+    (for/array ([k (in-range N)])
+               (for/sum ([n (in-range N)])
+                 (* (array-ref X (vector n))
+                    (exp (* (/ (* -2 pi 0+i) N) n k))))))
+  (cond [(N . < . 100) (naive-dft X)]
+        ;; placeholder for other implementations
+        [else (naive-dft X)])
+  )

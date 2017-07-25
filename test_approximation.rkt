@@ -7,12 +7,15 @@
          "fundamentals.rkt")
 
 (define-simple-check (check-all-= actual-numbers expected-numbers epsilon)
-                     (for ([actual actual-numbers]
-                           [expected expected-numbers])
-                       (check-= actual expected epsilon)))
+  (for ([actual actual-numbers]
+        [expected expected-numbers])
+    (check-= actual expected epsilon)))
 
 (define-simple-check (check-matrix-= M N epsilon)
-                     (check-all-= (matrix->list M) (matrix->list N) epsilon))
+  (check-all-= (matrix->list M) (matrix->list N) epsilon))
+
+(define-simple-check (check-array-= A B epsilon)
+  (check-all-= (array->list A) (array->list B) epsilon))
 
 (test-case
     "Polyval"
@@ -85,3 +88,8 @@
     (check-= (barycentric xs ys 0.0) 1.0 1e-9)
     ;; Notice how this has to be even nearer to b
     (check-= (barycentric xs ys 5.1) 0.079201 1e-6)))
+
+(test-case
+    "Trigonometric interpolation and FFT"
+  (check-array-= (dft (array #[1])) (array #[1]) 1e-9)
+  (check-array-= (dft (array #[1 1])) (array #[2 0]) 1e-9))
