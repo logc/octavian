@@ -7,12 +7,18 @@
          "fundamentals.rkt")
 
 (define-simple-check (check-all-= actual-numbers expected-numbers epsilon)
-                     (for ([actual actual-numbers]
-                           [expected expected-numbers])
-                       (check-= actual expected epsilon)))
+  (for ([actual actual-numbers]
+        [expected expected-numbers])
+    (check-= actual expected epsilon)))
 
 (define-simple-check (check-matrix-= M N epsilon)
-                     (check-all-= (matrix->list M) (matrix->list N) epsilon))
+  (check-all-= (matrix->list M) (matrix->list N) epsilon))
+
+(define-simple-check (check-array-= A B epsilon)
+  (check-all-= (array->list A) (array->list B) epsilon))
+
+(define (array-contiguous-slice arr start end)
+  (array-indexes-ref arr (for/array ([k (in-range start end)]) (vector k))))
 
 (test-case
     "Polyval"
@@ -85,3 +91,96 @@
     (check-= (barycentric xs ys 0.0) 1.0 1e-9)
     ;; Notice how this has to be even nearer to b
     (check-= (barycentric xs ys 5.1) 0.079201 1e-6)))
+
+(test-case
+    "Trigonometric interpolation and FFT"
+  (check-array-= (dft (array #[1])) (array #[1]) 1e-9)
+  (check-array-= (dft (array #[1 1])) (array #[2 0]) 1e-9)
+  (let* ([n 9]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [Y (dft (list->array ys))]
+         [Y-ct (cooley-turkey-dft (list->array ys))])
+    (check-array-= Y-ct Y 1e-9))
+  (let* ([n 10]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (idft (list->array ys))]
+         ;; Numbers taken from Octave's ifft function
+         [expected (array #[-0.65749
+                            -0.05236-0.42048i
+                            0.12061-0.16318i
+                            0.10256-0.06206i
+                            0.08339-0.02501i
+                            0.07455-0.00690i
+                            0.07455+0.00690i
+                            0.08339+0.02501i
+                            0.10256+0.06206i
+                            0.12061+0.16318i
+                            -0.05236+0.42048i])])
+    (check-array-= actual expected 1e-5))
+  (let* ([n 10]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (rader-dft (list->array ys))]
+         ;; Numbers taken from Octave's fft function
+         [expected (array #[-7.23237
+                            -0.57596+4.62532i
+                            1.32667+1.79495i
+                            1.12813+0.68268i
+                            0.91729+0.27506i
+                            0.82007+0.07585i
+                            0.82007-0.07585i
+                            0.91729-0.27506i
+                            1.12813-0.68268i
+                            1.32667-1.79495i
+                            -0.57596-4.62532i])])
+    (check-array-= actual expected 1e-5))
+  ;; Cooley-Turkey algorithm
+  (let* ([n 104]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (dft (list->array ys))]
+         [expected (array #[-71.8046
+                            -8.3086+44.2580i
+                            9.7192+17.3651i
+                            7.5798+6.9122i
+                            5.1723+3.2650i
+                            ])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  ;; Radix-2 DIT implemented in array-fft
+  (let* ([n 127]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (dft (list->array ys))]
+         [expected (array #[-87.5457
+                            -10.1411+53.9526i
+                            11.8357+21.1689i
+                            9.2275+8.4263i
+                            6.2928+3.9803i])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  ;; Rader algorithm
+  (let* ([n 100]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (dft (list->array ys))]
+         [expected (array #[-69.0667
+                            -7.9897+42.5720i
+                            9.3514+16.7036i
+                            7.2935+6.6489i
+                            4.9778+3.1406i])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  (let* ([n 100]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (idft (list->array ys))]
+         [expected (array #[-0.68382
+                            -0.07910-0.42150i
+                            0.09259-0.16538i
+                            0.07222-0.06583i
+                            0.04929-0.03110i
+                            ])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  )
+
+

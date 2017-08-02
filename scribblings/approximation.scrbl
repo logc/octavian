@@ -2,7 +2,8 @@
 @(require scribble/examples)
 @(require "pr-math.rkt")
 @require[@for-label[octavian
-                    racket]]
+                    racket
+                    math/array]]
 
 @setup-math
 @(define octavian-eval (make-base-eval))
@@ -61,4 +62,46 @@ computes the value at the abscissae @${x_1} of the polynomial interpolating data
 where
 
 @$${w_k = \left(\prod_{\substack{j=0 \\ j \neq k}}^{n}{x_k - x_j}\right)^{-1} , k=0,...,n}
+}
+
+
+@defproc[
+(dft [X (Array A)])
+(Array A)
+]{
+returns the discrete Fourier transform of the array @${X}. Unlike @racket[array-fft], it is
+not restricted to arrays of size @${2^n}. For small arrays, a simple naive algorithm is used.
+
+@$${ X_k = \sum_{n=0}^{N-1}{x_n e^{\frac{-2 \pi i k n}{N} }} }
+
+For bigger sizes, if they are a power of 2, then the efficient radix-2 DIT algorithm from
+@racket[array-fft] is used. If the bigger algorithm is not a power of 2, then a Cooley-Turkey
+Fast Fourier transform is selected. This algorithm does not work for sizes that are a prime
+number; for those arrays, an FFT is computed using Rader's algorithm.
+}
+
+@defproc[
+(idft [X (Array A)])
+(Array A)
+]{
+returns the inverse discrete Fourier transform of the array @${X}. The same algorithms are
+selected as for @racket[dft], each one of them in their inverse form.
+}
+
+
+@defproc[
+(cooley-turkey-dft [X (Array A)])
+(Array A)
+]{
+computes the discrete FFT of an array @${X} using the Cooley-Turkey algorithm. This is
+provided for users who want to select the underlying algorithm of @racket[dft].
+}
+
+
+@defproc[
+(rader-dft [X (Array A)])
+(Array A)
+]{
+computes the discrete FFT of an array @${X} using the Rader algorithm. This is provided
+for users who want to select the underlying algorithm of @racket[dft].
 }
