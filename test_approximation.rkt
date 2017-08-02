@@ -159,6 +159,16 @@
                             9.2275+8.4263i
                             6.2928+3.9803i])])
     (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  (let* ([n 127]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (idft (list->array ys))]
+         [expected (array #[-0.68395
+                            -0.07923-0.42150i
+                            0.09247-0.16538i
+                            0.07209-0.06583i
+                            0.04916-0.03110i])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
   ;; Rader algorithm
   (let* ([n 100]
          [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
@@ -180,7 +190,6 @@
                             0.07222-0.06583i
                             0.04929-0.03110i
                             ])])
-    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
-  )
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4)))
 
 
