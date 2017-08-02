@@ -91,15 +91,16 @@
 (define (idft X)
   (define N (array-size X))
   (define (naive-idft X)
-    (array-map (λ (x) (* (1 . / . N) x))
-               (for/array ([k (in-range N)])
-                          (for/sum ([l (in-range N)])
-                            (* (array-ref X (vector l))
-                               (inverse-twiddle-factor N l k))))))
-  (cond [(N . < . 100) (naive-idft X)]
-        [(power-of-two? N) (array-inverse-fft X)]
-        [(not  (prime? N)) (cooley-turkey-idft X)]
-        [else              (rader-idft X)]))
+    (for/array ([k (in-range N)])
+               (for/sum ([l (in-range N)])
+                 (* (array-ref X (vector l))
+                    (inverse-twiddle-factor N l k)))))
+  (define (scale result)
+    (array-map (λ (x) (* (1 . / . N) x)) result))
+  (scale (cond [(N . < . 100) (naive-idft X)]
+               [(power-of-two? N) (array-inverse-fft X)]
+               [(not  (prime? N)) (cooley-turkey-idft X)]
+               [else              (rader-idft X)])))
 
 ;; COOLEY-TURKEY-DFT is a fast Fourier transform for arrays of non-prime length
 ;;   cf. http://cnx.org/contents/ulXtQbN7@15/Implementing-FFTs-in-Practice#uid37

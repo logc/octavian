@@ -17,6 +17,9 @@
 (define-simple-check (check-array-= A B epsilon)
   (check-all-= (array->list A) (array->list B) epsilon))
 
+(define (array-contiguous-slice arr start end)
+  (array-indexes-ref arr (for/array ([k (in-range start end)]) (vector k))))
+
 (test-case
     "Polyval"
   (define p_0 (col-matrix [1.0]))
@@ -132,4 +135,52 @@
                             1.12813-0.68268i
                             1.32667-1.79495i
                             -0.57596-4.62532i])])
-    (check-array-= actual expected 1e-5)))
+    (check-array-= actual expected 1e-5))
+  ;; Cooley-Turkey algorithm
+  (let* ([n 104]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (dft (list->array ys))]
+         [expected (array #[-71.8046
+                            -8.3086+44.2580i
+                            9.7192+17.3651i
+                            7.5798+6.9122i
+                            5.1723+3.2650i
+                            ])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  ;; Radix-2 DIT implemented in array-fft
+  (let* ([n 127]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (dft (list->array ys))]
+         [expected (array #[-87.5457
+                            -10.1411+53.9526i
+                            11.8357+21.1689i
+                            9.2275+8.4263i
+                            6.2928+3.9803i])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  ;; Rader algorithm
+  (let* ([n 100]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (dft (list->array ys))]
+         [expected (array #[-69.0667
+                            -7.9897+42.5720i
+                            9.3514+16.7036i
+                            7.2935+6.6489i
+                            4.9778+3.1406i])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  (let* ([n 100]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (idft (list->array ys))]
+         [expected (array #[-0.68382
+                            -0.07910-0.42150i
+                            0.09259-0.16538i
+                            0.07222-0.06583i
+                            0.04929-0.03110i
+                            ])])
+    (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4))
+  )
+
+
