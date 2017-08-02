@@ -7,8 +7,7 @@
          dft
          idft
          cooley-turkey-dft
-         rader-dft
-         fft-factorize)
+         rader-dft)
 
 (require math/base
          math/number-theory
@@ -98,7 +97,6 @@
                             (* (array-ref X (vector l))
                                (inverse-twiddle-factor N l k))))))
   (cond [(N . < . 100) (naive-idft X)]
-        ;; TODO: hook up other implementations
         [(power-of-two? N) (array-inverse-fft X)]
         [(not  (prime? N)) (cooley-turkey-idft X)]
         [else              (rader-idft X)]))

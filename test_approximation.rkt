@@ -133,19 +133,3 @@
                             1.32667-1.79495i
                             -0.57596-4.62532i])])
     (check-array-= actual expected 1e-5)))
-
-(test-case
-    "Factorization of n for FFT"
-  (let-values ([(n1 n2) (fft-factorize 12)])
-    (check-eqv? n1 2)
-    (check-eqv? n2 6)
-    (check-eqv? (* n1 n2) 12))
-  (let-values ([(n1 n2) (fft-factorize 21)])
-    (check-eqv? n1 3)
-    (check-eqv? n2 7)
-    (check-eqv? (* n1 n2) 21))
-  (let-values ([(n1 n2) (fft-factorize 105)])
-    (check-eqv? n1 3)
-    (check-eqv? n2 35)
-    (check-eqv? (* n1 n2) 105))
-  (check-exn exn:fail? (lambda () (fft-factorize 11))))
