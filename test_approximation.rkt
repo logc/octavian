@@ -92,4 +92,60 @@
 (test-case
     "Trigonometric interpolation and FFT"
   (check-array-= (dft (array #[1])) (array #[1]) 1e-9)
-  (check-array-= (dft (array #[1 1])) (array #[2 0]) 1e-9))
+  (check-array-= (dft (array #[1 1])) (array #[2 0]) 1e-9)
+  (let* ([n 9]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [Y (dft (list->array ys))]
+         [Y-ct (cooley-turkey-dft (list->array ys))])
+    (check-array-= Y-ct Y 1e-9))
+  (let* ([n 10]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (idft (list->array ys))]
+         ;; Numbers taken from Octave's ifft function
+         [expected (array #[-0.65749
+                            -0.05236-0.42048i
+                            0.12061-0.16318i
+                            0.10256-0.06206i
+                            0.08339-0.02501i
+                            0.07455-0.00690i
+                            0.07455+0.00690i
+                            0.08339+0.02501i
+                            0.10256+0.06206i
+                            0.12061+0.16318i
+                            -0.05236+0.42048i])])
+    (check-array-= actual expected 1e-5))
+  (let* ([n 10]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (map (lambda (x) (* x (x . - . (* 2 pi)) (exp (* -1 x)))) xs)]
+         [actual (rader-dft (list->array ys))]
+         ;; Numbers taken from Octave's fft function
+         [expected (array #[-7.23237
+                            -0.57596+4.62532i
+                            1.32667+1.79495i
+                            1.12813+0.68268i
+                            0.91729+0.27506i
+                            0.82007+0.07585i
+                            0.82007-0.07585i
+                            0.91729-0.27506i
+                            1.12813-0.68268i
+                            1.32667-1.79495i
+                            -0.57596-4.62532i])])
+    (check-array-= actual expected 1e-5)))
+
+(test-case
+    "Factorization of n for FFT"
+  (let-values ([(n1 n2) (fft-factorize 12)])
+    (check-eqv? n1 2)
+    (check-eqv? n2 6)
+    (check-eqv? (* n1 n2) 12))
+  (let-values ([(n1 n2) (fft-factorize 21)])
+    (check-eqv? n1 3)
+    (check-eqv? n2 7)
+    (check-eqv? (* n1 n2) 21))
+  (let-values ([(n1 n2) (fft-factorize 105)])
+    (check-eqv? n1 3)
+    (check-eqv? n2 35)
+    (check-eqv? (* n1 n2) 105))
+  (check-exn exn:fail? (lambda () (fft-factorize 11))))
