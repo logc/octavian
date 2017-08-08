@@ -7,7 +7,8 @@
          dft
          idft
          cooley-turkey-dft
-         rader-dft)
+         rader-dft
+         fftshift)
 
 (require math/base
          math/number-theory
@@ -184,3 +185,15 @@
   (define H_tilde (idft (array* (dft h_tilde) (dft w_tilde))))
   (define H (invert-reorder H_tilde))
   (list->array (cons h_0 (array->list H))))
+
+(define (fftshift arr)
+  (define n (array-size arr))
+  (define halfpoint
+    (if (even? n)
+        (/ n 2)
+        (/ (add1 n) 2)))
+  (define left
+    (array-indexes-ref arr (for/array ([k (in-range halfpoint)]) (vector k))))
+  (define right
+    (array-indexes-ref arr (for/array ([k (in-range halfpoint n)]) (vector k))))
+  (array-append* (list right left)))
