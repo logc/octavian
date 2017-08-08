@@ -192,4 +192,32 @@
                             ])])
     (check-array-= (array-contiguous-slice actual 0 5) expected 1e-4)))
 
+(test-case
+    "fftshift"
+  (let ([x_even (array #[1 2 3 4 5 6])]
+        [expect (array #[4 5 6 1 2 3])])
+    (check-array-= (fftshift x_even) expect 1e-9))
+  (let ([x_odd (array #[1 2 3 4 5 6 7])]
+        [expect (array #[5 6 7 1 2 3 4])])
+    (check-array-= (fftshift x_odd) expect 1e-9)))
 
+
+(test-case
+    "Interpolation in example 3.7"
+  (let* ([n 9]
+         [xs (for/list ([k (in-range (+ n 1))]) (* 2 pi (1 . / . (+ n 1)) k))]
+         [ys (for/array ([x xs]) (* x (x . - . (* 2 pi)) (exp (* -1 x))))]
+         [Y (dft ys)]
+         [C (array-map (λ (x) (x . / . (+ n 1))) (fftshift Y))]
+         [expect (array #[
+                          0.08701
+                          0.09258-0.02140i
+                          0.10985-0.06008i
+                          0.12681-0.16211i
+                          -0.04673-0.42001i
+                          -0.65203
+                          -0.04673+0.42001i
+                          0.12681+0.16211i
+                          0.10985+0.06008i
+                          0.09258+0.02140i])])
+    (check-array-= C expect 1e-5)))

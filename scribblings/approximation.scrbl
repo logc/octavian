@@ -105,3 +105,26 @@ provided for users who want to select the underlying algorithm of @racket[dft].
 computes the discrete FFT of an array @${X} using the Rader algorithm. This is provided
 for users who want to select the underlying algorithm of @racket[dft].
 }
+
+
+@defproc[
+(fftshift [X (Array A)])
+(Array A)
+]{
+rearranges a Fourier transform @${X} by shifting the zero-frequency component to
+the center of the array.
+
+Elements of @${X} are related to coefficients @${c_k} of the trigonometric
+interpolant function @${\widetilde{f}} by the formula:
+
+@$${ c_k = \frac{1}{n + 1} \sum_{j=0}^{n}{f(x_j) e^{-ikjh} } }
+
+for @${k = -M, ..., M}, where
+
+@$${ M = \frac{n - 1}{2} }
+
+After @racket[fftshift], the elements of @${X} are rearranged as
+
+@$${ X_{shifted} = [x_{−(M+μ)}, . . . , x_{−1}, x_0, . . . , x_M ] }
+
+}
