@@ -18,7 +18,7 @@
            (bisection f a x 𝛆 (sub1 nmax))]
           [((* (f x) (f b)) . < . 0)
            (bisection f x b 𝛆 (sub1 nmax))]
-          [else error "could not find a zero"]))]))
+          [else (error "could not find a zero")]))]))
 
 ;; K_MIN minimum number of steps that are necessary to find a zero in the
 ;;   interval `[a, b]` with tolerance `𝛆`
@@ -29,7 +29,6 @@
 (define (logarithm base n)
   (/ (log n) (log base)))
 
-
 ;; NEWTON find zeroes of function `f` using Newton's method, which requires the
 ;;   derivative function `df` and a starting point `x_0`.  The function also
 ;;   takes a tolerance `𝛆` and a maximum number of iterations `nmax`.
@@ -38,9 +37,6 @@
          [x (- x_0 diff)])
     (cond [(or (= (f x) 0) (= nmax 0) ((magnitude diff) . <= . 𝛆)) x]
           [else (newton f df x 𝛆 (sub1 nmax))])))
-
-;; NEWTONSYS not implemented
-(define (newtonsys) empty)
 
 ;; AITKEN finds approximations of fixed point `𝜶` of function `𝜙` starting from
 ;;   initial point `x_0` using Aitken's extrapolation method. The method stops

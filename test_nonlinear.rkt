@@ -10,6 +10,7 @@
     (check-= (bisection f  0 1 𝛆) 0 𝛆)
     (check-= (bisection f -1 0 𝛆) 0 𝛆)
     (check-= (bisection f -1 1 𝛆) 0 𝛆)
+    (check-exn exn:fail? (λ () (bisection f 1 2 𝛆 10)))
     (check-= (bisection g -1 1 𝛆) -1 𝛆)
     (check-= (bisection g -2 2 𝛆) -1 𝛆)))
 (test-case
@@ -66,7 +67,8 @@
         [𝛆 1e-10]
         [x_0 2])
     (check-= (aitken 𝜙_0 x_0 𝛆) 1.0 𝛆)
-    (check-= (aitken 𝜙_1 x_0 𝛆) 1.0 𝛆)))
+    (check-= (aitken 𝜙_1 x_0 𝛆) 1.0 𝛆)
+    (check-= (aitken 𝜙_0 x_0 𝛆 101 1 (+ 𝛆 2)) 1.0 𝛆)))
 
 (test-case
   "Check that Hörner synthetic division does the same as a normal evaluation"
